@@ -1,0 +1,33 @@
+
+/* Orchid List - Lab 05 */
+
+.orchid-number {
+  width: 65px;
+  text-align: center !important;
+  font-weight: 600;
+  color: #647d6c;
+}
+
+.orchid-table th:first-child {
+  border-radius: 10px 0 0 0;
+}
+
+.orchid-table th:last-child {
+  border-radius: 0 10px 0 0;
+}
+
+.collection-page {
+  padding-top: 12px;
+}
+
+.collection-panel {
+  min-height: 300px;
+}
+
+.collection-heading h2 {
+  margin-top: 0;
+}
+
+.flower-name {
+  line-height: 1.5;
+}
