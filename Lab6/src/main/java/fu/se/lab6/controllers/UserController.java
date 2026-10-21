@@ -1,0 +1,51 @@
+
+package fu.se.lab6.controllers;
+
+import fu.se.lab6.entities.User;
+import fu.se.lab6.responses.UserResponse;
+import fu.se.lab6.services.UserService;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> me(
+            @AuthenticationPrincipal User user) {
+
+        return ResponseEntity.ok(
+                toResponse(user));
+    }
+
+    @GetMapping
+    public List<UserResponse> allUsers() {
+
+        return userService.allUsers()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private UserResponse toResponse(User user) {
+
+        return new UserResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+    }
+}
