@@ -1,5 +1,3 @@
-// ============================================================
-// FILE: LoginPage.jsx
 // MỤC ĐÍCH: Trang đăng nhập — thu thập username/password từ người dùng,
 // validate đầu vào, sau đó gọi hàm onLogin từ App.jsx để xác thực.
 //
@@ -11,8 +9,8 @@
 import { useState } from "react";
 
 // Props:
-//   onLogin: hàm handleLogin từ App.jsx, được truyền xuống để LoginPage gọi
-function LoginPage({ onLogin }) {
+//   onLogin: nhận hàm handleLogin từ App.jsx, được truyền xuống để LoginPage gọi
+function LoginPage({ onLogin }) {  //onLogin là props → đến từ bên ngoài (App.jsx truyền vào), LoginPage không tự thay đổi được
     // State lưu giá trị người dùng đang gõ trong form
     const [username, setUsername] = useState(""); // giá trị ô input username
     const [password, setPassword] = useState(""); // giá trị ô input password

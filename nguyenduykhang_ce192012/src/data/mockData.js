@@ -1,5 +1,3 @@
-// ============================================================
-// FILE: mockData.js
 // MỤC ĐÍCH: Dữ liệu giả lập (mock data) thay thế cho database thật.
 // Vì đây là assignment dùng React thuần (không có backend/API),
 // toàn bộ dữ liệu được khai báo thủ công ở đây.
@@ -53,6 +51,9 @@ export const initialUsers = [
 // Danh sách bài viết tin tức ban đầu
 // categoryId: ID của category mà bài viết thuộc về (quan hệ với initialCategories)
 // createdBy:  ID của user đã tạo bài viết (quan hệ với initialUsers)
+// News chỉ lưu ID của category và user. Khi hiển thị, ta dùng 
+// categories.find(c => c.id === item.categoryId) để tra tên. 
+// → Giống như database dùng Foreign Key.
 export const initialNews = [
     {
         id: "n1",

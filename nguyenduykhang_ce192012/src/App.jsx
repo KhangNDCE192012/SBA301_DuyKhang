@@ -1,13 +1,11 @@
-// ============================================================
-// FILE: App.jsx
 // MỤC ĐÍCH: Component gốc — "bộ não" của toàn bộ ứng dụng.
 // Chịu trách nhiệm:
 //   1. Giữ toàn bộ state dùng chung (categories, news, users)
 //   2. Kiểm soát xác thực (auth): đã login hay chưa
 //   3. Điều hướng (navigation): trang nào đang hiển thị
 //
-// Không có file này → không có nơi chia sẻ dữ liệu giữa các trang,
-// và không có cơ chế bảo vệ trang admin.
+// Không có file này → không có nơi chia sẻ dữ liệu giữa các trang (→ Category, News, Users mỗi page tự giữ → không chia sẻ được),
+// và không có cơ chế bảo vệ trang admin (Không có auth control → ai cũng vào được trang admin).
 // ============================================================
 
 import { useState } from "react";
@@ -64,10 +62,10 @@ function App() {
       });
 
       setActivePage("Dashboard"); // Sau login, luôn về trang Dashboard
-      return true;                // Báo LoginPage: thành công
+      return true;                // Báo cho LoginPage biết: thành công
     }
 
-    return false; // Báo LoginPage: sai thông tin
+    return false; // Báo cho LoginPage: sai thông tin/thất bại
   }
 
   // ── HANDLE LOGOUT ────────────────────────────────────────────
@@ -88,6 +86,7 @@ function App() {
   // Không dùng React Router — thay vào đó dùng switch-case.
   // Mỗi case trả về component tương ứng với trang đang active.
   // Props được truyền xuống để các trang đọc/cập nhật shared data.
+  // Khi activePage thay đổi → React re-render → renderPage() trả về component khác → UI đổi trang.
   function renderPage() {
     switch (activePage) {
       case "Dashboard":

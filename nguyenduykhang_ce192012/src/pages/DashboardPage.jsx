@@ -1,5 +1,3 @@
-// ============================================================
-// FILE: DashboardPage.jsx
 // MỤC ĐÍCH: Trang tổng quan — hiển thị các số liệu thống kê của hệ thống.
 //
 // Đây là "pure presentational component": không có state riêng,

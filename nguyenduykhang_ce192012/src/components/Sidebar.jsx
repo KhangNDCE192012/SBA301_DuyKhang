@@ -1,5 +1,3 @@
-// ============================================================
-// FILE: Sidebar.jsx
 // MỤC ĐÍCH: Menu điều hướng bên trái — cho phép chuyển giữa các trang
 // bằng cách cập nhật state activePage trong App.jsx.
 //

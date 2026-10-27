@@ -12,8 +12,8 @@ import App from "./App.jsx";
 import "./index.css"; // CSS toàn cục cho toàn bộ app
 
 // ReactDOM.createRoot: tạo "vùng quản lý" của React trong DOM
-// document.getElementById("root"): tìm thẻ <div id="root"> trong index.html
-// .render(...): vẽ component <App /> vào trong thẻ đó
+// document.getElementById("root"): Gắn toàn bộ app React vào thẻ 
+// <div id="root"> trong index.html
 ReactDOM.createRoot(document.getElementById("root")).render(
     // React.StrictMode: chế độ kiểm tra lỗi — KHÔNG ảnh hưởng giao diện,
     // chỉ giúp phát hiện lỗi tiềm ẩn trong quá trình phát triển.

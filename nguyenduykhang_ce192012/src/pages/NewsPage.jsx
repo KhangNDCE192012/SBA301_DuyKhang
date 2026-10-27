@@ -1,5 +1,3 @@
-// ============================================================
-// FILE: NewsPage.jsx
 // MỤC ĐÍCH: Trang quản lý bài viết tin tức — CRUD đầy đủ.
 //
 // Điểm khác biệt so với CategoryPage:

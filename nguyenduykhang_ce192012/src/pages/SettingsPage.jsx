@@ -1,5 +1,3 @@
-// ============================================================
-// FILE: SettingsPage.jsx
 // MỤC ĐÍCH: Trang cài đặt — hiển thị thông tin profile của người dùng
 // đang đăng nhập và thông tin chung của ứng dụng.
 //
