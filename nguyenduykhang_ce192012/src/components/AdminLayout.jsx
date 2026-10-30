@@ -1,3 +1,5 @@
+// Nguyễn Duy Khang - CE192012 - Assignment 1
+
 // MỤC ĐÍCH: Bộ khung bố cục (layout) dùng chung cho toàn bộ trang admin.
 // Gồm 3 vùng:
 //   - Header: thanh trên cùng (tên app + thông tin user + Logout)

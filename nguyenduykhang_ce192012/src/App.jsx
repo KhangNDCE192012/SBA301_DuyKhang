@@ -1,3 +1,5 @@
+// Nguyễn Duy Khang - CE192012 - Assignment 1
+
 // MỤC ĐÍCH: Component gốc — "bộ não" của toàn bộ ứng dụng.
 // Chịu trách nhiệm:
 //   1. Giữ toàn bộ state dùng chung (categories, news, users)
@@ -41,6 +43,7 @@ function App() {
   const [activePage, setActivePage] = useState("Dashboard");
 
   // ── SHARED DATA (dữ liệu dùng chung cho nhiều trang) ────────
+  // lấy dữ liệu từ mockData.js nạp vào bộ nhớ RAM của component.
   // Đặt state ở App.jsx để các trang con có thể dùng chung.
   // Ví dụ: NewsPage cần categories để dropdown chọn danh mục.
   const [categories, setCategories] = useState(initialCategories);

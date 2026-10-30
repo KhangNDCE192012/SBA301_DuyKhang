@@ -1,3 +1,5 @@
+// Nguyễn Duy Khang - CE192012 - Assignment 1
+
 // MỤC ĐÍCH: Thanh điều hướng trên cùng của trang admin.
 // Hiển thị: tên ứng dụng (brand) + tên người dùng đang login + nút Logout.
 //

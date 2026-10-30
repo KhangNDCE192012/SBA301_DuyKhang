@@ -1,5 +1,5 @@
-// ============================================================
-// FILE: main.jsx
+// Nguyễn Duy Khang - CE192012 - Assignment 1
+
 // MỤC ĐÍCH: Điểm khởi động (entry point) của toàn bộ ứng dụng React.
 // Đây là file chạy đầu tiên — nó gắn component <App /> vào thẻ
 // <div id="root"> trong file index.html.

@@ -1,3 +1,5 @@
+// Nguyễn Duy Khang - CE192012 - Assignment 1
+
 // MỤC ĐÍCH: Dữ liệu giả lập (mock data) thay thế cho database thật.
 // Vì đây là assignment dùng React thuần (không có backend/API),
 // toàn bộ dữ liệu được khai báo thủ công ở đây.
