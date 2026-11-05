@@ -1,4 +1,3 @@
-
 package com.funews.assignment2.service;
 
 import com.funews.assignment2.dto.ApiDtos.*;
@@ -12,8 +11,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
+/**
+ * Nguyễn Duy Khang - CE192012 - Assignment 2
+ * Class này chứa toàn bộ nghiệp vụ quản lý bài viết tin tức (NewsArticle):
+ * - Tìm kiếm, lọc theo danh mục, trạng thái active/inactive
+ * - Tạo bài viết kèm mã UUID và gán quan hệ nhiều-nhiều với Tag
+ * - Cập nhật, xóa bài viết
+ * - Truy vấn lịch sử tạo bài viết của chính Staff đang đăng nhập (My History)
+ */
 @Service
 public class NewsArticleService {
 
@@ -31,10 +37,8 @@ public class NewsArticleService {
         this.tagRepository = tagRepository;
     }
 
-    // CONVERT ENTITY TO DTO
-
+    // Chuyển Entity NewsArticle sang DTO NewsView (bao gồm cả danh sách TagView)
     private NewsView toView(NewsArticle n) {
-
         List<TagView> tags = n.getTags()
                 .stream()
                 .map(t -> new TagView(
@@ -51,22 +55,21 @@ public class NewsArticleService {
                 n.getCreatedDate(),
                 n.getNewsContent(),
                 n.getNewsSource(),
-                n.getCategory() == null
-                        ? null : n.getCategory().getCategoryId(),
-                n.getCategory() == null
-                        ? null : n.getCategory().getCategoryName(),
+                n.getCategory() == null ? null : n.getCategory().getCategoryId(),
+                n.getCategory() == null ? null : n.getCategory().getCategoryName(),
                 n.getNewsStatus(),
-                n.getCreatedBy() == null
-                        ? null : n.getCreatedBy().getAccountId(),
-                n.getCreatedBy() == null
-                        ? null : n.getCreatedBy().getAccountName(),
+                n.getCreatedBy() == null ? null : n.getCreatedBy().getAccountId(),
+                n.getCreatedBy() == null ? null : n.getCreatedBy().getAccountName(),
                 n.getModifiedDate(),
                 tags
         );
     }
 
-    // GET ALL NEWS ARTICLES
-
+    /**
+     * Lấy danh sách bài viết đa tiêu chí:
+     * - Khách vãng lai (currentUser == null) hoặc Admin (Role 1): CHỈ được xem bài active (newsStatus = true).
+     * - Staff (Role 2): Được xem toàn bộ bài viết (kể cả inactive) để quản lý.
+     */
     @Transactional(readOnly = true)
     public List<NewsView> getAll(
             String search,
@@ -74,59 +77,34 @@ public class NewsArticleService {
             Boolean activeOnly,
             SystemAccount currentUser
     ) {
-
-        // PUBLIC USER AND ADMIN:
-        // Only view active news articles
-
         boolean publicUser =
                 currentUser == null ||
-                        Integer.valueOf(1).equals(
-                                currentUser.getAccountRole()
-                        );
-
-        // Only Staff can access management data
+                        Integer.valueOf(1).equals(currentUser.getAccountRole());
 
         if (currentUser != null &&
                 !publicUser &&
-                !Integer.valueOf(2).equals(
-                        currentUser.getAccountRole()
-                )) {
-
+                !Integer.valueOf(2).equals(currentUser.getAccountRole())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "Invalid role"
             );
         }
 
-        // Public users and Admin always see active news.
-        // Staff can see all news when activeOnly is false.
+        boolean filterActive = publicUser || Boolean.TRUE.equals(activeOnly);
 
-        boolean onlyActive =
-                publicUser || Boolean.TRUE.equals(activeOnly);
-
-        String keyword =
-                search == null || search.isBlank()
-                        ? null : search.trim();
-
-        return newsRepository.searchArticles(
-                        keyword,
-                        categoryId,
-                        onlyActive,
-                        null
-                )
+        return newsRepository
+                .searchArticles(search, categoryId, filterActive, null)
                 .stream()
                 .map(this::toView)
                 .toList();
     }
 
-    // GET NEWS ARTICLE BY ID
-
+    /**
+     * Lấy chi tiết một bài viết theo ID:
+     * Khách vãng lai không được phép xem các bài viết có trạng thái inactive.
+     */
     @Transactional(readOnly = true)
-    public NewsView getById(
-            String id,
-            SystemAccount currentUser
-    ) {
-
+    public NewsView getById(String id, SystemAccount currentUser) {
         NewsArticle article = newsRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -135,16 +113,11 @@ public class NewsArticleService {
                         )
                 );
 
-        // Public users and Admin cannot view inactive news.
+        boolean publicUser =
+                currentUser == null ||
+                        Integer.valueOf(1).equals(currentUser.getAccountRole());
 
-        if ((currentUser == null ||
-                Integer.valueOf(1).equals(
-                        currentUser.getAccountRole()
-                ))
-                && !Boolean.TRUE.equals(
-                article.getNewsStatus()
-        )) {
-
+        if (publicUser && !Boolean.TRUE.equals(article.getNewsStatus())) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "News article not found"
@@ -154,14 +127,15 @@ public class NewsArticleService {
         return toView(article);
     }
 
-    // STAFF: CREATE NEWS ARTICLE
-
+    /**
+     * Staff tạo bài viết mới:
+     * 1. Kiểm tra danh mục có tồn tại không.
+     * 2. Sinh mã ID ngẫu nhiên: "N" + 19 ký tự UUID (ví dụ: N4a8f2b3c9d1e5f6a7b).
+     * 3. Gán thời gian tạo hiện tại và người tạo là Staff đang đăng nhập.
+     * 4. Gán danh sách Tag (quan hệ nhiều - nhiều).
+     */
     @Transactional
-    public NewsView create(
-            NewsRequest request,
-            SystemAccount currentUser
-    ) {
-
+    public NewsView create(NewsRequest request, SystemAccount currentUser) {
         Category category = categoryRepository.findById(
                 request.categoryId()
         ).orElseThrow(() ->
@@ -196,15 +170,16 @@ public class NewsArticleService {
         return toView(newsRepository.save(article));
     }
 
-    // STAFF: UPDATE NEWS ARTICLE
-
+    /**
+     * Staff chỉnh sửa bài viết:
+     * Cập nhật thông tin nội dung, danh mục, trạng thái, ngày sửa (ModifiedDate) và danh sách tags.
+     */
     @Transactional
     public NewsView update(
             String id,
             NewsRequest request,
             SystemAccount currentUser
     ) {
-
         NewsArticle article = newsRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -237,10 +212,8 @@ public class NewsArticleService {
         return toView(newsRepository.save(article));
     }
 
-    // GET TAGS
-
+    // Tra cứu danh sách Tag từ CSDL theo Set ID truyền lên
     private Set<Tag> getTags(Set<Integer> tagIds) {
-
         if (tagIds == null || tagIds.isEmpty()) {
             return new HashSet<>();
         }
@@ -248,7 +221,6 @@ public class NewsArticleService {
         List<Tag> found = tagRepository.findAllById(tagIds);
 
         if (found.size() != tagIds.size()) {
-
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "One or more tags do not exist"
@@ -258,11 +230,12 @@ public class NewsArticleService {
         return new HashSet<>(found);
     }
 
-    // STAFF: DELETE NEWS ARTICLE
-
+    /**
+     * Staff xóa bài viết:
+     * Xóa các liên kết trong bảng trung gian NewsTag trước, sau đó xóa bài viết khỏi bảng NewsArticle.
+     */
     @Transactional
     public void delete(String id) {
-
         NewsArticle article = newsRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -272,17 +245,14 @@ public class NewsArticleService {
                 );
 
         article.getTags().clear();
-
         newsRepository.delete(article);
     }
 
-    // STAFF: VIEW OWN NEWS HISTORY
-
+    /**
+     * Lấy lịch sử tất cả bài viết do chính Staff đang đăng nhập tạo ra, sắp xếp giảm dần theo ngày tạo.
+     */
     @Transactional(readOnly = true)
-    public List<NewsView> getMyHistory(
-            SystemAccount currentUser
-    ) {
-
+    public List<NewsView> getMyHistory(SystemAccount currentUser) {
         return newsRepository
                 .findByCreatedBy_AccountIdOrderByCreatedDateDesc(
                         currentUser.getAccountId()

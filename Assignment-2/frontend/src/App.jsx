@@ -1,3 +1,10 @@
+/**
+ * Nguyễn Duy Khang - CE192012 - Assignment 2
+ * Component gốc của ứng dụng, chịu trách nhiệm định nghĩa toàn bộ
+ * các route (đường dẫn) và điều hướng người dùng đến đúng trang.
+ * Sử dụng ProtectedRoute để bảo vệ các trang cần đăng nhập/phân quyền.
+ */
+
 import {
     Routes,
     Route,
@@ -19,20 +26,24 @@ import MyProfile from "./pages/MyProfile";
 
 export default function App() {
 
+    // Lấy thông tin người dùng hiện tại từ AuthContext
     const { user } = useAuth();
 
     return (
 
         <>
+            {/* Header hiển thị trên tất cả các trang */}
             <Header />
 
             <Routes>
 
+                {/* Trang chủ: hiển thị tin tức công khai cho mọi người dùng */}
                 <Route
                     path="/"
                     element={<PublicNews />}
                 />
 
+                {/* Trang đăng nhập: nếu đã đăng nhập thì chuyển về trang chủ */}
                 <Route
                     path="/login"
                     element={
@@ -42,6 +53,7 @@ export default function App() {
                     }
                 />
 
+                {/* Trang quản lý tài khoản: chỉ dành cho Admin (role = 1) */}
                 <Route
                     path="/admin/accounts"
                     element={
@@ -51,6 +63,7 @@ export default function App() {
                     }
                 />
 
+                {/* Trang quản lý danh mục: chỉ dành cho Staff (role = 2) */}
                 <Route
                     path="/staff/categories"
                     element={
@@ -60,6 +73,7 @@ export default function App() {
                     }
                 />
 
+                {/* Trang quản lý tin tức: chỉ dành cho Staff (role = 2) */}
                 <Route
                     path="/staff/news"
                     element={
@@ -69,6 +83,7 @@ export default function App() {
                     }
                 />
 
+                {/* Trang lịch sử tin tức cá nhân: chỉ dành cho Staff (role = 2) */}
                 <Route
                     path="/staff/history"
                     element={
@@ -78,6 +93,7 @@ export default function App() {
                     }
                 />
 
+                {/* Trang hồ sơ cá nhân: chỉ dành cho Staff (role = 2) */}
                 <Route
                     path="/staff/profile"
                     element={
@@ -87,6 +103,7 @@ export default function App() {
                     }
                 />
 
+                {/* Mọi đường dẫn không khớp đều chuyển về trang chủ */}
                 <Route
                     path="*"
                     element={<Navigate to="/" />}

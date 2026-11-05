@@ -1,6 +1,5 @@
 package com.funews.assignment2.service;
 
-
 import com.funews.assignment2.dto.ApiDtos.*;
 import com.funews.assignment2.entity.SystemAccount;
 import com.funews.assignment2.repository.AccountRepository;
@@ -13,6 +12,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * Nguyễn Duy Khang - CE192012 - Assignment 2
+ * Class này chứa toàn bộ nghiệp vụ quản lý tài khoản (SystemAccount) dành cho Admin
+ * và chức năng tự cập nhật thông tin cá nhân (Profile) dành cho Staff.
+ */
 @Service
 public class AccountService {
 
@@ -27,6 +31,7 @@ public class AccountService {
         this.newsRepository = newsRepository;
     }
 
+    // Chuyển đổi từ Entity SystemAccount sang DTO AccountView để trả về cho Client
     private AccountView toView(SystemAccount a) {
         return new AccountView(
                 a.getAccountId(),
@@ -36,8 +41,10 @@ public class AccountService {
         );
     }
 
+    /**
+     * Lấy danh sách tài khoản kèm tính năng tìm kiếm gần đúng theo tên hoặc email.
+     */
     public List<AccountView> getAll(String search) {
-
         List<SystemAccount> accounts;
 
         if (search == null || search.isBlank()) {
@@ -54,8 +61,10 @@ public class AccountService {
                 .toList();
     }
 
+    /**
+     * Lấy thông tin chi tiết một tài khoản theo ID.
+     */
     public AccountView getById(Short id) {
-
         SystemAccount account = accountRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -67,21 +76,22 @@ public class AccountService {
         return toView(account);
     }
 
+    /**
+     * Admin tạo mới một tài khoản:
+     * - Bắt buộc phải có mật khẩu.
+     * - Kiểm tra trùng lặp email.
+     * - Tự động tăng ID bằng cách lấy ID lớn nhất hiện tại + 1.
+     */
     @Transactional
     public AccountView create(AccountRequest request) {
-
-        if (request.accountPassword() == null ||
-                request.accountPassword().isBlank()) {
-
+        if (request.accountPassword() == null || request.accountPassword().isBlank()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Password is required"
             );
         }
 
-        if (accountRepository.existsByAccountEmailIgnoreCase(
-                request.accountEmail())) {
-
+        if (accountRepository.existsByAccountEmailIgnoreCase(request.accountEmail())) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Email already exists"
@@ -90,12 +100,11 @@ public class AccountService {
 
         short nextId = (short) (
                 accountRepository.findTopByOrderByAccountIdDesc()
-                        .map(a -> a.getAccountId())
+                        .map(SystemAccount::getAccountId)
                         .orElse((short) 0) + 1
         );
 
         SystemAccount account = new SystemAccount();
-
         account.setAccountId(nextId);
         account.setAccountName(request.accountName());
         account.setAccountEmail(request.accountEmail());
@@ -105,12 +114,13 @@ public class AccountService {
         return toView(accountRepository.save(account));
     }
 
+    /**
+     * Admin cập nhật thông tin tài khoản:
+     * - Kiểm tra email mới có bị trùng với tài khoản khác không.
+     * - Nếu mật khẩu để trống thì giữ nguyên mật khẩu cũ.
+     */
     @Transactional
-    public AccountView update(
-            Short id,
-            AccountRequest request
-    ) {
-
+    public AccountView update(Short id, AccountRequest request) {
         SystemAccount account = accountRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -119,11 +129,9 @@ public class AccountService {
                         )
                 );
 
-        if (accountRepository
-                .existsByAccountEmailIgnoreCaseAndAccountIdNot(
-                        request.accountEmail(), id
-                )) {
-
+        if (accountRepository.existsByAccountEmailIgnoreCaseAndAccountIdNot(
+                request.accountEmail(), id
+        )) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Email already exists"
@@ -134,18 +142,20 @@ public class AccountService {
         account.setAccountEmail(request.accountEmail());
         account.setAccountRole(request.accountRole());
 
-        if (request.accountPassword() != null &&
-                !request.accountPassword().isBlank()) {
-
+        if (request.accountPassword() != null && !request.accountPassword().isBlank()) {
             account.setAccountPassword(request.accountPassword());
         }
 
         return toView(accountRepository.save(account));
     }
 
+    /**
+     * Admin xóa tài khoản:
+     * - RÀNG BUỘC NGHIỆP VỤ: Nếu tài khoản này đã từng tạo bất kỳ bài báo nào
+     *   (existsByCreatedBy_AccountId == true) thì ném lỗi 409 CONFLICT, không cho xóa.
+     */
     @Transactional
     public void delete(Short id) {
-
         SystemAccount account = accountRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -155,7 +165,6 @@ public class AccountService {
                 );
 
         if (newsRepository.existsByCreatedBy_AccountId(id)) {
-
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Cannot delete account because it created news articles"
@@ -165,18 +174,16 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
+    /**
+     * Staff tự cập nhật thông tin cá nhân (My Profile):
+     * Cho phép đổi tên, email (không được trùng với tài khoản khác) và mật khẩu mới (nếu có nhập).
+     */
     @Transactional
-    public AccountView updateProfile(
-            SystemAccount currentUser,
-            ProfileRequest request
-    ) {
-
-        if (accountRepository
-                .existsByAccountEmailIgnoreCaseAndAccountIdNot(
-                        request.accountEmail(),
-                        currentUser.getAccountId()
-                )) {
-
+    public AccountView updateProfile(SystemAccount currentUser, ProfileRequest request) {
+        if (accountRepository.existsByAccountEmailIgnoreCaseAndAccountIdNot(
+                request.accountEmail(),
+                currentUser.getAccountId()
+        )) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Email already exists"
@@ -186,9 +193,7 @@ public class AccountService {
         currentUser.setAccountName(request.accountName());
         currentUser.setAccountEmail(request.accountEmail());
 
-        if (request.accountPassword() != null &&
-                !request.accountPassword().isBlank()) {
-
+        if (request.accountPassword() != null && !request.accountPassword().isBlank()) {
             currentUser.setAccountPassword(request.accountPassword());
         }
 
