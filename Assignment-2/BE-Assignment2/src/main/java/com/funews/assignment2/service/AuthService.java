@@ -27,8 +27,8 @@ public class AuthService {
         this.sessionService = sessionService;
     }
 
-    /**
-     * Xử lý đăng nhập:
+    /** =========================================================
+     * Xử lý LOGIN:
      * 1. Tìm tài khoản theo email (không phân biệt hoa thường).
      * 2. Đối chiếu mật khẩu (plain text).
      * 3. Kiểm tra Role hợp lệ (1: Admin, 2: Staff).
@@ -74,8 +74,8 @@ public class AuthService {
         return new LoginResponse(token, view);
     }
 
-    /**
-     * Xử lý đăng xuất:
+    /** =======================================================
+     * Xử lý LOGOUT:
      * Lấy token từ header Authorization và xóa khỏi SessionService để kết thúc phiên làm việc.
      */
     public void logout(String authorization) {

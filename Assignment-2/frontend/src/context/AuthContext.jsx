@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(false);
 
     /**
-     * Hàm đăng nhập: gọi authService.login() → nhận token và account từ server.
+     * Hàm LOGIN : gọi authService.login() → nhận token và account từ server.
      * Lưu token và user vào localStorage, cập nhật state user.
      * Được gọi từ Login.jsx khi người dùng submit form → handleSubmit → login().
      */
@@ -65,7 +65,7 @@ export function AuthProvider({ children }) {
     };
 
     /**
-     * Hàm đăng xuất: gọi authService.logout() để invalidate token phía server,
+     * Hàm LOGOUT: gọi authService.logout() để invalidate token phía server,
      * sau đó xóa token và user khỏi localStorage, reset state user về null.
      * Được gọi từ Header.jsx khi người dùng nhấn nút Logout → handleLogout → logout().
      */
@@ -86,7 +86,7 @@ export function AuthProvider({ children }) {
     };
 
     /**
-     * Hàm cập nhật thông tin user trong context và localStorage.
+     * Hàm UPDATE thông tin user trong context và localStorage.
      * Được gọi từ MyProfile.jsx sau khi cập nhật hồ sơ thành công.
      */
     const updateUser = (account) => {

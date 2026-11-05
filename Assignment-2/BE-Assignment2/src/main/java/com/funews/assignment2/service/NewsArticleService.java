@@ -65,8 +65,8 @@ public class NewsArticleService {
         );
     }
 
-    /**
-     * Lấy danh sách bài viết đa tiêu chí:
+    /** ======================================================================
+     * LẤY DANH SÁCH BÀI VIẾT đa tiêu chí:
      * - Khách vãng lai (currentUser == null) hoặc Admin (Role 1): CHỈ được xem bài active (newsStatus = true).
      * - Staff (Role 2): Được xem toàn bộ bài viết (kể cả inactive) để quản lý.
      */
@@ -99,8 +99,8 @@ public class NewsArticleService {
                 .toList();
     }
 
-    /**
-     * Lấy chi tiết một bài viết theo ID:
+    /** ==========================================
+     * LẤY CHI TIẾT MỘT BÀI VIẾT THEO ID:
      * Khách vãng lai không được phép xem các bài viết có trạng thái inactive.
      */
     @Transactional(readOnly = true)
@@ -127,8 +127,8 @@ public class NewsArticleService {
         return toView(article);
     }
 
-    /**
-     * Staff tạo bài viết mới:
+    /** ===============================================================
+     * STAFF TẠO BÀI VIẾT MỚI:
      * 1. Kiểm tra danh mục có tồn tại không.
      * 2. Sinh mã ID ngẫu nhiên: "N" + 19 ký tự UUID (ví dụ: N4a8f2b3c9d1e5f6a7b).
      * 3. Gán thời gian tạo hiện tại và người tạo là Staff đang đăng nhập.
@@ -170,8 +170,8 @@ public class NewsArticleService {
         return toView(newsRepository.save(article));
     }
 
-    /**
-     * Staff chỉnh sửa bài viết:
+    /** ========================================================================
+     * STAFF UPDATE BÀI VIẾT:
      * Cập nhật thông tin nội dung, danh mục, trạng thái, ngày sửa (ModifiedDate) và danh sách tags.
      */
     @Transactional
@@ -230,8 +230,8 @@ public class NewsArticleService {
         return new HashSet<>(found);
     }
 
-    /**
-     * Staff xóa bài viết:
+    /** ===================================================================
+     * STAFF XÓA BÀI VIẾT:
      * Xóa các liên kết trong bảng trung gian NewsTag trước, sau đó xóa bài viết khỏi bảng NewsArticle.
      */
     @Transactional
@@ -248,7 +248,7 @@ public class NewsArticleService {
         newsRepository.delete(article);
     }
 
-    /**
+    /** ============================================
      * Lấy lịch sử tất cả bài viết do chính Staff đang đăng nhập tạo ra, sắp xếp giảm dần theo ngày tạo.
      */
     @Transactional(readOnly = true)

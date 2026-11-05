@@ -42,11 +42,8 @@ public class CategoryService {
         );
     }
 
-    /**
-     * Lấy danh sách danh mục:
-     * - activeOnly = true: Dành cho Public/Admin (chỉ xem các danh mục đang hoạt động).
-     * - activeOnly = false: Dành cho Staff (xem tất cả để quản lý).
-     * - Có hỗ trợ tìm kiếm theo tên hoặc mô tả.
+    /** =========================
+     * Lấy DANH SÁCH CATEGORY:
      */
     public List<CategoryView> getAll(String search, boolean activeOnly) {
         List<Category> categories;
@@ -66,8 +63,8 @@ public class CategoryService {
                 .toList();
     }
 
-    /**
-     * Staff tạo mới một danh mục:
+    /** ============================================================
+     * STAFF ADD CATEGORY:
      * - Kiểm tra danh mục cha (parentCategoryId) nếu có phải tồn tại trong database.
      */
     @Transactional
@@ -83,8 +80,8 @@ public class CategoryService {
         return toView(categoryRepository.save(category));
     }
 
-    /**
-     * Staff cập nhật danh mục:
+    /** ==========================================================
+     * STAFF UPDATE CATEGORY:
      * - Kiểm tra không cho phép chọn chính mình làm danh mục cha.
      */
     @Transactional
@@ -107,7 +104,7 @@ public class CategoryService {
         return toView(categoryRepository.save(category));
     }
 
-    /**
+    /** =====================================
      * Kiểm tra tính hợp lệ của danh mục cha:
      * 1. Không thể tự làm cha của chính mình (parentId == currentId).
      * 2. Danh mục cha phải thực sự tồn tại trong CSDL.
@@ -133,7 +130,7 @@ public class CategoryService {
     }
 
     /**
-     * Staff xóa danh mục:
+     * STAFF DELETE CATEGORY:
      * - RÀNG BUỘC 1: Nếu danh mục đang có bài viết sử dụng (existsByCategory_CategoryId) -> ném 409 CONFLICT.
      * - RÀNG BUỘC 2: Nếu danh mục đang là cha của danh mục khác (existsByParentCategoryId) -> ném 409 CONFLICT.
      */

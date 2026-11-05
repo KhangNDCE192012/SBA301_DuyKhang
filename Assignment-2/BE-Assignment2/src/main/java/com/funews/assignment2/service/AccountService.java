@@ -41,8 +41,8 @@ public class AccountService {
         );
     }
 
-    /**
-     * Lấy danh sách tài khoản kèm tính năng tìm kiếm gần đúng theo tên hoặc email.
+    /** =====================================================
+     * LẤY DANH SÁCH TÀI KHOẢN kèm tính năng tìm kiếm gần đúng theo tên hoặc email.
      */
     public List<AccountView> getAll(String search) {
         List<SystemAccount> accounts;
@@ -61,7 +61,7 @@ public class AccountService {
                 .toList();
     }
 
-    /**
+    /** ===========================
      * Lấy thông tin chi tiết một tài khoản theo ID.
      */
     public AccountView getById(Short id) {
@@ -76,8 +76,8 @@ public class AccountService {
         return toView(account);
     }
 
-    /**
-     * Admin tạo mới một tài khoản:
+    /** ===========================================================
+     * ADMIN ADD MỘT TÀI KHOẢN:
      * - Bắt buộc phải có mật khẩu.
      * - Kiểm tra trùng lặp email.
      * - Tự động tăng ID bằng cách lấy ID lớn nhất hiện tại + 1.
@@ -114,8 +114,8 @@ public class AccountService {
         return toView(accountRepository.save(account));
     }
 
-    /**
-     * Admin cập nhật thông tin tài khoản:
+    /** =========================================================
+     * ADMIN UPDATE thông tin tài khoản:
      * - Kiểm tra email mới có bị trùng với tài khoản khác không.
      * - Nếu mật khẩu để trống thì giữ nguyên mật khẩu cũ.
      */
@@ -149,8 +149,8 @@ public class AccountService {
         return toView(accountRepository.save(account));
     }
 
-    /**
-     * Admin xóa tài khoản:
+    /** ===============================================================
+     * ADMIN DELETE tài khoản:
      * - RÀNG BUỘC NGHIỆP VỤ: Nếu tài khoản này đã từng tạo bất kỳ bài báo nào
      *   (existsByCreatedBy_AccountId == true) thì ném lỗi 409 CONFLICT, không cho xóa.
      */
@@ -174,8 +174,8 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
-    /**
-     * Staff tự cập nhật thông tin cá nhân (My Profile):
+    /** =================================================
+     * STAFF TỰ CẬP NHẬT THÔNG TIN CÁ NHÂN (My Profile):
      * Cho phép đổi tên, email (không được trùng với tài khoản khác) và mật khẩu mới (nếu có nhập).
      */
     @Transactional

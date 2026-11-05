@@ -32,18 +32,18 @@ export default function App() {
     return (
 
         <>
-            {/* Header hiển thị trên tất cả các trang */}
+            {/* Header*/}
             <Header />
 
             <Routes>
 
-                {/* Trang chủ: hiển thị tin tức công khai cho mọi người dùng */}
+                {/* Trang chủ */}
                 <Route
                     path="/"
                     element={<PublicNews />}
                 />
 
-                {/* Trang đăng nhập: nếu đã đăng nhập thì chuyển về trang chủ */}
+                {/* Trang đăng nhập */}
                 <Route
                     path="/login"
                     element={
