@@ -1,0 +1,604 @@
+{
+  "info": {
+    "_postman_id": "a3-ce192012-fuminihotel-2026",
+    "name": "Assignment-3 - FU Mini Hotel (CE192012)",
+    "description": "Postman requests for SBA301 Assignment 03. Log in first to save customerToken or staffToken.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "staffToken",
+      "value": ""
+    },
+    {
+      "key": "customerId",
+      "value": "1"
+    },
+    {
+      "key": "roomId",
+      "value": "1"
+    },
+    {
+      "key": "bookingId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Public",
+      "item": [
+        {
+          "name": "View active rooms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/rooms"
+          }
+        },
+        {
+          "name": "Search rooms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/rooms/search?roomTypeId=1&minPrice=1&maxPrice=200"
+          }
+        },
+        {
+          "name": "View room types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/room-types"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Authentication",
+      "item": [
+        {
+          "name": "Register customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerFullName\": \"Test Customer\",\n  \"telephone\": \"0901234567\",\n  \"emailAddress\": \"test.customer@example.com\",\n  \"customerBirthday\": \"2002-05-20\",\n  \"password\": \"Customer@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/customer/register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.customerId) pm.collectionVariables.set('customerId', body.data.customerId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Customer login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.token) pm.collectionVariables.set('customerToken', body.data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@fuminihotel.com\",\n  \"password\": \"Customer@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/customer/login"
+          }
+        },
+        {
+          "name": "Staff login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.token) pm.collectionVariables.set('staffToken', body.data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"staff@fuminihotel.com\",\n  \"password\": \"Staff@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/staff/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Customer",
+      "item": [
+        {
+          "name": "Get my profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/customer/profile"
+          }
+        },
+        {
+          "name": "Update my profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerFullName\": \"Demo Customer Updated\",\n  \"telephone\": \"0907654321\",\n  \"customerBirthday\": \"2002-05-20\"\n}"
+            },
+            "url": "{{baseUrl}}/api/customer/profile"
+          }
+        },
+        {
+          "name": "Create booking (multiple rooms)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"roomId\": 1, \"startDate\": \"2026-12-10\", \"endDate\": \"2026-12-12\" },\n    { \"roomId\": 2, \"startDate\": \"2026-12-10\", \"endDate\": \"2026-12-12\" }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/customer/bookings"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.bookingReservationId) pm.collectionVariables.set('bookingId', body.data.bookingReservationId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get my booking history",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/customer/bookings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Staff Customers",
+      "item": [
+        {
+          "name": "List / search customers",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/staff/customers?search=customer"
+          }
+        },
+        {
+          "name": "Create customer",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerFullName\": \"Walk-in Customer\",\n  \"telephone\": \"0900000000\",\n  \"emailAddress\": \"walkin@example.com\",\n  \"customerBirthday\": \"2000-01-01\",\n  \"password\": \"Customer@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/staff/customers"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.customerId) pm.collectionVariables.set('customerId', body.data.customerId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update customer (change ID first)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerFullName\": \"Walk-in Customer Updated\",\n  \"telephone\": \"0901111111\",\n  \"emailAddress\": \"walkin@example.com\",\n  \"customerBirthday\": \"2000-01-01\",\n  \"customerStatus\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/staff/customers/{{customerId}}"
+          }
+        },
+        {
+          "name": "Delete customer (change ID first)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/staff/customers/{{customerId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Staff Rooms",
+      "item": [
+        {
+          "name": "List all rooms",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/staff/rooms"
+          }
+        },
+        {
+          "name": "Create room",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"401\",\n  \"roomDetailDescription\": \"Quiet room on the fourth floor\",\n  \"roomMaxCapacity\": 2,\n  \"roomTypeId\": 1,\n  \"roomStatus\": 1,\n  \"roomPricePerDay\": 85.00\n}"
+            },
+            "url": "{{baseUrl}}/api/staff/rooms"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.roomId) pm.collectionVariables.set('roomId', body.data.roomId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update room (change ID first)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"401\",\n  \"roomDetailDescription\": \"Updated room description\",\n  \"roomMaxCapacity\": 2,\n  \"roomTypeId\": 1,\n  \"roomStatus\": 1,\n  \"roomPricePerDay\": 90.00\n}"
+            },
+            "url": "{{baseUrl}}/api/staff/rooms/{{roomId}}"
+          }
+        },
+        {
+          "name": "Delete room (change ID first)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/staff/rooms/{{roomId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Staff Reservations",
+      "item": [
+        {
+          "name": "List reservations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/staff/bookings"
+          }
+        },
+        {
+          "name": "Create offline reservation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"items\": [\n    { \"roomId\": 1, \"startDate\": \"2026-12-15\", \"endDate\": \"2026-12-17\" }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/staff/bookings"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.bookingReservationId) pm.collectionVariables.set('bookingId', body.data.bookingReservationId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update reservation details (change ID first)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"items\": [\n    { \"roomId\": 1, \"startDate\": \"2026-12-16\", \"endDate\": \"2026-12-18\" }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/staff/bookings/{{bookingId}}"
+          }
+        },
+        {
+          "name": "Update reservation status (change ID first)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/staff/bookings/{{bookingId}}/status"
+          }
+        },
+        {
+          "name": "Delete reservation (change ID first)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{staffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/staff/bookings/{{bookingId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
